@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grass Cutting Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #eee;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      border: 2px solid #333;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="640" height="480"></canvas>
+
+  <script>
+    // Get canvas and its drawing context
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Define cell size and compute grid dimensions
+    const cellSize = 32;
+    const cols = Math.floor(canvas.width / cellSize);
+    const rows = Math.floor(canvas.height / cellSize);
+
+    // Create a grid that will store whether each cell has been cut (true) or not (false)
+    const grid = [];
+    for (let row = 0; row < rows; row++) {
+      const rowArray = [];
+      for (let col = 0; col < cols; col++) {
+        rowArray.push(false);
+      }
+      grid.push(rowArray);
+    }
+
+    // The player object with grid coordinates
+    const player = { x: 0, y: 0 };
+
+    // Mark the starting cell as cut
+    grid[player.y][player.x] = true;
+
+    // Function to draw the grid (grass)
+    function drawGrid() {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          // Color: green for uncut, tan/brown for cut
+          ctx.fillStyle = grid[row][col] ? "#C2B280" : "#00AA00";
+          ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+
+          // Optional: draw grid lines for clarity
+          ctx.strokeStyle = "#ccc";
+          ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    // Function to draw the player (lawn mower)
+    function drawPlayer() {
+      ctx.fillStyle = "#000"; // Black color for the player
+      // Draw the player as a rectangle with some padding
+      ctx.fillRect(player.x * cellSize + 4, player.y * cellSize + 4, cellSize - 8, cellSize - 8);
+    }
+
+    // Update the player's current cell to "cut" the grass
+    function updateGrass() {
+      grid[player.y][player.x] = true;
+    }
+
+    // The main game loop that redraws the scene continuously
+    function gameLoop() {
+      drawGrid();
+      drawPlayer();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Start the game loop
+    gameLoop();
+
+    // Listen for keydown events to move the player using arrow keys
+    window.addEventListener('keydown', function (event) {
+      // Prevent default actions (e.g., scrolling)
+      event.preventDefault();
+
+      // Handle arrow keys
+      switch (event.key) {
+        case "ArrowUp":
+          if (player.y > 0) {
+            player.y--;
+            updateGrass();
+          }
+          break;
+        case "ArrowDown":
+          if (player.y < rows - 1) {
+            player.y++;
+            updateGrass();
+          }
+          break;
+        case "ArrowLeft":
+          if (player.x > 0) {
+            player.x--;
+            updateGrass();
+          }
+          break;
+        case "ArrowRight":
+          if (player.x < cols - 1) {
+            player.x++;
+            updateGrass();
+          }
+          break;
+        default:
+          break;
+      }
+    });
+  </script>
+</body>
+</html>
